@@ -1,8 +1,9 @@
 import discord
 from discord.ext import commands
 import os
-from dotenv import load_dotenv
 import asyncio
+from dotenv import load_dotenv
+from datetime import datetime  # Importation ajoutée
 from utils.keep_alive import keep_alive
 from utils.scheduler_helper import fetch_anime_data, display_next_anime_timer, start_scheduler, get_last_anime
 
