@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 import asyncio
 from utils.keep_alive import keep_alive
-from utils.scheduler_helper import fetch_anime_data, display_next_anime_timer, start_scheduler
+from utils.scheduler_helper import fetch_anime_data, display_next_anime_timer, start_scheduler, get_last_anime
 
 # Charger le fichier .env pour récupérer le token
 load_dotenv()
@@ -34,9 +34,20 @@ async def load_extensions():
 async def on_ready():
     print(f"Connecté en tant que {bot.user}")
     # Afficher le dernier anime annoncé
-    last_anime = await fetch_anime_data()
-    if last_anime:
-        print(f"Le dernier anime annoncé est : {last_anime.get('title', 'Aucun')}")
+    last_anime = get_last_anime()
+    if last_anime:  # Vérifie si des données existent dans last_anime.json
+        print(f"Le dernier anime annoncé est : {last_anime.get('title', 'Aucun')} (Épisode {last_anime.get('episode', 'Inconnu')})")
+    else:
+        print("Aucun anime annoncé précédemment.")
+    
+    # Récupération et affichage du prochain épisode
+    anime_list = await fetch_anime_data()
+    if anime_list:
+        next_anime = anime_list[0]  # Le premier anime de la liste triée
+        airing_time = datetime.fromtimestamp(next_anime["airing_time"]).strftime("%Y-%m-%d %H:%M:%S")
+        print(f"Prochain anime : {next_anime['title']} (Épisode {next_anime['episode']}) à {airing_time}")
+    else:
+        print("Aucun anime à venir.")
 
     # Lancer le planificateur
     await start_scheduler(bot)
